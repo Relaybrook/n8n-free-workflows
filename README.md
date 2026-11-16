@@ -51,3 +51,7 @@ The free workflows here are complete on their own; you don't need to buy anythin
 ---
 
 n8n is a trademark of n8n GmbH. Relaybrook is not affiliated with, endorsed by or sponsored by n8n GmbH.
+
+## Want the full versions?
+
+These free workflows are part of Relaybrook. Production-ready packs (AI lead enrichment, inbox triage, content repurposing) are at https://relaybrook.bytesell.app. Launch offer: 10% off every pack with code CRYPTO10 until Nov 30, 2026 (crypto checkout).
