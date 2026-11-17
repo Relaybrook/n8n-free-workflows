@@ -1,0 +1,649 @@
+{
+  "name": "Crypto Price Alert Lite (free, by Relaybrook)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Crypto Price Alert Lite (free)\nBy **Relaybrook**. Checks a short coin list against your own price thresholds and sends **one** message when a coin crosses one.\n\n**Try it now:** click *Execute workflow*. Test mode is ON, so it uses sample prices and only shows the alert in **Preview (test mode)**. No keys, no accounts.\n\n**Go live**\n1. In **Config** edit `watchlist` (one coin per line, CoinGecko ids).\n2. Set where alerts go (see the note on the right).\n3. Set `test_mode = false`, save, and *Publish/Activate*. The schedule runs every 15 min.\n\nEach rule alerts once, then re-arms after the price moves back across the line, so you are not pinged every 15 minutes.\n\nPrice data by CoinGecko (free, no API key).",
+        "height": 520,
+        "width": 380,
+        "color": 4
+      },
+      "id": "6c80a72c-ca56-5ac0-bcda-4d1dac7e1369",
+      "name": "About",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### watchlist format\n```\nbitcoin: above 70000, below 60000\nethereum: below 2000\n```\nUse CoinGecko coin ids (the id is in the coin's URL on coingecko.com, e.g. `the-open-network` for TON). Prices are in `vs_currency` (default usd).",
+        "height": 220,
+        "width": 340
+      },
+      "id": "32b27203-503e-5281-bb39-d858456e03d6",
+      "name": "Watchlist help",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### Where alerts go\nTest mode never sends anything. With `test_mode = false`:\n- **Webhook** (Discord, Slack, or any URL): paste it into `webhook_url`. `webhook_format` = discord | slack | json.\n- **Telegram**: create a bot with @BotFather, add a Telegram credential in **Send Telegram**, right-click it -> *Activate*, and fill `telegram_chat_id`.\nNo webhook and no chat id? Nothing is sent.",
+        "height": 260,
+        "width": 400
+      },
+      "id": "2675d1e6-dac7-5abe-a91f-db22f4e96101",
+      "name": "Where alerts go",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        -300
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "3731b330-1b5b-5e75-937f-0b06844b1d78",
+      "name": "Every 15 minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        60
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "a5423178-b918-589d-8ff0-de6bb6edf8e8",
+      "name": "Run now (manual)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "assignments": {
+          "assignments": [
+            {
+              "id": "011a968f-e424-54b3-af19-1c320f46dfba",
+              "name": "test_mode",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "bafca9e3-08d2-5c30-acef-277300948c75",
+              "name": "watchlist",
+              "value": "bitcoin: above 70000, below 60000\nethereum: below 2000\nsolana: above 200",
+              "type": "string"
+            },
+            {
+              "id": "7aaf5dd0-1db2-54b7-84cb-fb51135b8b0e",
+              "name": "vs_currency",
+              "value": "usd",
+              "type": "string"
+            },
+            {
+              "id": "f190ce13-0344-588d-9cc9-a59a36c9ee04",
+              "name": "webhook_url",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "69f9d554-998a-5a1a-abc7-55aa3a0f4c38",
+              "name": "webhook_format",
+              "value": "discord",
+              "type": "string"
+            },
+            {
+              "id": "1fbcbe0f-40c9-5dbd-b049-0f3caec1f319",
+              "name": "telegram_chat_id",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "d743f519-7aeb-53e1-ae9a-750d2133f639",
+              "name": "coingecko_base_url",
+              "value": "https://api.coingecko.com/api/v3",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "d3338864-756c-5e29-bc56-ff43c8048f0c",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Turns the watchlist text into rules: [{coin, dir: 'above'|'below', level}]\nconst cfg = $('Config').first().json;\nconst rules = [], problems = [];\nfor (const raw of String(cfg.watchlist || '').split(/\\r?\\n/)) {\n  const line = raw.trim();\n  if (!line || line.startsWith('#')) continue;\n  const m = line.match(/^([a-z0-9-]+)\\s*:\\s*(.+)$/i);\n  if (!m) { problems.push('Could not read line: ' + line); continue; }\n  const coin = m[1].toLowerCase();\n  for (const part of m[2].split(',')) {\n    const r = part.trim().match(/^(above|below)\\s+\\$?([0-9][0-9.,_]*)$/i);\n    if (!r) { problems.push('Could not read rule \"' + part.trim() + '\" for ' + coin); continue; }\n    const level = Number(r[2].replace(/[,_]/g, ''));\n    if (!isFinite(level) || level <= 0) { problems.push('Bad number in \"' + part.trim() + '\"'); continue; }\n    rules.push({ coin, dir: r[1].toLowerCase(), level });\n  }\n}\nif (!rules.length) throw new Error('No valid rules in watchlist. Example line: \"bitcoin: above 70000, below 60000\". ' + problems.join(' | '));\nconst coins = [...new Set(rules.map(r => r.coin))];\nconst vs = String(cfg.vs_currency || 'usd').toLowerCase();\nconst url = String(cfg.coingecko_base_url || 'https://api.coingecko.com/api/v3').replace(/\\/+$/, '') +\n  '/simple/price?ids=' + encodeURIComponent(coins.join(',')) + '&vs_currencies=' + encodeURIComponent(vs);\nreturn [{ json: { rules, coins, vs, url, problems } }];"
+      },
+      "id": "4a1f88ec-7909-5372-821f-6a37a5551915",
+      "name": "Parse Watchlist",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "eab7609c-2c96-5bf7-a27b-795adb79c443",
+              "leftValue": "={{ $('Config').first().json.test_mode }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "1f298ffb-9e7b-50bb-a371-91d3fa999623",
+      "name": "Test mode?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        720,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Sample CoinGecko /simple/price response (made-up prices) so test mode needs no network.\n// bitcoin 58,900 (below 60,000 -> alert), ethereum 2,450 (no alert), solana 212 (above 200 -> alert)\nreturn [{ json: { data: JSON.stringify({ bitcoin: { usd: 58900 }, ethereum: { usd: 2450 }, solana: { usd: 212 } }), statusCode: 200, sample: true } }];"
+      },
+      "id": "e4e18470-79da-5cfd-bcdd-de1a5aa99e85",
+      "name": "Sample Prices (test mode)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "text"
+            }
+          },
+          "timeout": 20000
+        }
+      },
+      "id": "797eb199-f5ad-536e-ab8e-938ae3abf29e",
+      "name": "Get Prices (CoinGecko)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        240
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Compares prices to the rules. Each rule fires once, then re-arms when the price is back on the other side.\nconst cfg = $('Config').first().json;\nconst p = $('Parse Watchlist').first().json;\nconst res = $input.first().json;\nconst live = !cfg.test_mode;\nconst state = $getWorkflowStaticData('global');\nstate.fired = state.fired || {};\nconst status = Number(res.statusCode || 0);\nlet prices = null, error = null;\nif (status === 429) error = 'CoinGecko rate limit (HTTP 429). Run less often, or try again later.';\nelse if (status && status !== 200) error = 'CoinGecko answered HTTP ' + status + '.';\nelse { const raw = res.body !== undefined ? res.body : res.data;\n  try { prices = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch (e) { error = 'Could not read CoinGecko response.'; }\n  if (!error && (!prices || typeof prices !== 'object')) error = 'Empty response from CoinGecko.'; }\nif (!error && res.error) error = 'Request failed: ' + (res.error.message || res.error);\nconst fmt = n => n >= 1 ? n.toLocaleString('en-US', { maximumFractionDigits: 2 }) : String(Number(n.toPrecision(4)));\nconst alerts = [], unknown = [];\nif (!error) {\n  for (const r of p.rules) {\n    const price = prices && prices[r.coin] ? Number(prices[r.coin][p.vs]) : NaN;\n    if (!isFinite(price)) { if (!unknown.includes(r.coin)) unknown.push(r.coin); continue; }\n    const key = r.coin + '|' + r.dir + '|' + r.level;\n    const hit = r.dir === 'above' ? price > r.level : price < r.level;\n    if (hit && !(live && state.fired[key])) {\n      alerts.push({ coin: r.coin, dir: r.dir, level: r.level, price, text: r.coin + ' is ' + r.dir + ' ' + fmt(r.level) + ' ' + p.vs.toUpperCase() + ' (now ' + fmt(price) + ')' });\n    }\n    if (live) { if (hit) state.fired[key] = true; else delete state.fired[key]; }\n  }\n}\nconst lines = alerts.map(a => (a.dir === 'above' ? '\\u{1F53A} ' : '\\u{1F53B} ') + a.text);\nconst notes = [...p.problems];\nif (unknown.length) notes.push('No price for: ' + unknown.join(', ') + ' (check the CoinGecko id)');\nif (error) notes.push(error);\nconst text = lines.length ? 'Price alert\\n' + lines.join('\\n') + (notes.length ? '\\n\\nNote: ' + notes.join(' | ') : '') + '\\n\\nData by CoinGecko' : '';\nconst fmtName = String(cfg.webhook_format || 'discord').toLowerCase();\nconst webhook_body = fmtName === 'slack' ? { text } : fmtName === 'json' ? { alerts, notes, source: 'CoinGecko' } : { content: text };\nreturn [{ json: { alert_count: alerts.length, alerts, notes, message: text, webhook_body, test_mode: !live, checked_at: new Date().toISOString() } }];"
+      },
+      "id": "c4db1668-6972-5797-abee-2d3dae66dab1",
+      "name": "Evaluate Alerts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "853da010-349f-563a-96f5-36f0df488db9",
+              "leftValue": "={{ $json.alert_count > 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "787c8a46-ad41-52bf-b775-4fdd331b222b",
+      "name": "Any alerts?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        140
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "bce68c19-6655-5693-b6ad-b98158540ee0",
+      "name": "No alerts",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "137e3c57-5735-54b7-b9c6-6392c1357a19",
+              "leftValue": "={{ $('Config').first().json.test_mode }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "29e82cf2-3370-51da-b570-57f32b5e4ef4",
+      "name": "Test mode? (preview only)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        60
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "a4bf5739-766d-55a5-9e63-410905b041cd",
+      "name": "Preview (test mode)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6184855a-1e98-5763-8050-123e52f16410",
+              "leftValue": "={{ /^https?:\\/\\//.test($('Config').first().json.webhook_url || '') }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "8d4d3904-50bb-5d00-9b72-640410f5f62e",
+      "name": "Webhook set?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "aeb65fa2-235c-50f7-a095-b795394633e4",
+              "leftValue": "={{ !!$('Config').first().json.telegram_chat_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "42231fce-af0e-5425-a028-c9e13c2a43e6",
+      "name": "Telegram set?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').first().json.webhook_url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.webhook_body) }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "9e47c79e-38cf-54cd-8ff5-0ed5fbe29401",
+      "name": "Post to Webhook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2160,
+        60
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "id": "4dd48508-732b-55ea-86db-2ade76085c7e",
+      "name": "Telegram not set",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Config').first().json.telegram_chat_id }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_web_page_preview": true
+        }
+      },
+      "id": "19f1547e-a732-5421-839c-d4e912408a00",
+      "name": "Send Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2160,
+        240
+      ],
+      "disabled": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "continueRegularOutput",
+      "webhookId": "db9e4d03-08c4-50f3-9a1e-c9e20d4e5b37"
+    }
+  ],
+  "connections": {
+    "Every 15 minutes": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run now (manual)": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Parse Watchlist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Watchlist": {
+      "main": [
+        [
+          {
+            "node": "Test mode?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test mode?": {
+      "main": [
+        [
+          {
+            "node": "Sample Prices (test mode)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Prices (CoinGecko)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sample Prices (test mode)": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Prices (CoinGecko)": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Alerts": {
+      "main": [
+        [
+          {
+            "node": "Any alerts?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Any alerts?": {
+      "main": [
+        [
+          {
+            "node": "Test mode? (preview only)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test mode? (preview only)": {
+      "main": [
+        [
+          {
+            "node": "Preview (test mode)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Webhook set?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Telegram set?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook set?": {
+      "main": [
+        [
+          {
+            "node": "Post to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram set?": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram not set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "id": "rbCryptoLite0001",
+  "versionId": "28cb41d3-417e-5654-9fcd-ee14b17cf436",
+  "tags": []
+}
