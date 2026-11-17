@@ -1,0 +1,19 @@
+name: Lead list cleaner output contracts
+on:
+  push:
+    paths: ['workflows/lead-list-cleaner/**', 'tests/lead-list-cleaner/**', '.github/workflows/lead-list-cleaner-tests.yml']
+  pull_request:
+    paths: ['workflows/lead-list-cleaner/**', 'tests/lead-list-cleaner/**', '.github/workflows/lead-list-cleaner-tests.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm exec --yes --package=n8n@2.47.7 --package=@blucca/n8n-check@0.1.9 -- node tests/lead-list-cleaner/check.mjs

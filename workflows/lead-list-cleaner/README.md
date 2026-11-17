@@ -26,6 +26,18 @@ Clean and deduplicate a lead list from Google Sheets or a CSV file, with no AI a
 
 The workflow ships with `source = sample`. Click **Execute workflow** right after import: 12 synthetic messy rows go in, 9 cleaned rows come out (3 duplicates merged), and the summary shows the counts. No credentials needed.
 
+### Repeatable name regression check
+
+The test keeps the original 12 synthetic rows and reads the current workflow export. It checks the nine cleaned names and the 12/9/3 summary, including outer whitespace before a title in both `Full Name` and `First Name`. CSV and Google Sheets branches stay skipped.
+
+With Node.js 24 or newer:
+
+```sh
+npm exec --yes --package=n8n@2.47.7 --package=@blucca/n8n-check@0.1.9 -- node tests/lead-list-cleaner/check.mjs
+```
+
+Reports are saved in `temp/lead-list-cleaner-tests/`. The same check runs in GitHub Actions when this workflow or its tests change.
+
 ## Limitations
 
 - Rule-based only. It checks email syntax and known domain lists; it does not check whether a mailbox actually exists.

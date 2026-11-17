@@ -1,0 +1,75 @@
+[
+  {
+    "Full Name": "  JOHN   SMITH ",
+    "E-mail": "John.Smith@Acme-Corp.example ",
+    "Company": "Acme Corp, Inc.",
+    "Website": "https://www.acme-corp.example/about"
+  },
+  {
+    "Full Name": "john smith",
+    "E-mail": "john.smith@acme-corp.example",
+    "Company": "ACME CORP",
+    "Website": "",
+    "Phone": "+1 415 555 0100"
+  },
+  {
+    "Full Name": "mary o'brien",
+    "E-mail": "mary.obrien@gmial.com",
+    "Company": "Freelance",
+    "Website": ""
+  },
+  {
+    "Full Name": "Ludwig van der berg",
+    "E-mail": "mailto:LUDWIG@vanderberg.example",
+    "Company": "Van der Berg BV",
+    "Website": "vanderberg.example"
+  },
+  {
+    "Full Name": "Dr. ANNA-LENA MÜLLER",
+    "E-mail": "a.mueller@web.de",
+    "Company": "Müller GmbH",
+    "Website": "http://mueller-gmbh.example/"
+  },
+  {
+    "Full Name": "Sales Team",
+    "E-mail": "sales@northwind.example",
+    "Company": "Northwind",
+    "Website": "northwind.example"
+  },
+  {
+    "Full Name": "Alex Rivera",
+    "E-mail": "alex.rivera@mailinator.com",
+    "Company": "",
+    "Website": ""
+  },
+  {
+    "Full Name": "Sam Lee",
+    "E-mail": "sam.lee@@brightpixel",
+    "Company": "Bright Pixel",
+    "Website": "brightpixel.example"
+  },
+  {
+    "Full Name": "jane doe",
+    "E-mail": "Jane.Doe+webinar@gmail.com",
+    "Company": "",
+    "Website": ""
+  },
+  {
+    "Full Name": "Jane Doe",
+    "E-mail": "janedoe@gmail.com",
+    "Company": "Doe Design",
+    "Website": "doedesign.example"
+  },
+  {
+    "Full Name": "Kevin McDonald",
+    "E-mail": "",
+    "Company": "Highland Ventures LLC",
+    "Website": "www.highlandventures.example"
+  },
+  {
+    "Full Name": "kevin mcdonald",
+    "E-mail": "",
+    "Company": "Highland Ventures",
+    "Website": "highlandventures.example/team"
+  }
+]
