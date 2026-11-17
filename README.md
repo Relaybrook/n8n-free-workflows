@@ -2,9 +2,9 @@
 
 # Relaybrook: free n8n workflows
 
-Free, ready-to-import [n8n](https://n8n.io) workflows for lead research, lead-list cleanup, inbox triage and content repurposing.
+Free, ready-to-import [n8n](https://n8n.io) workflows for lead research, lead-list cleanup, inbox triage, content repurposing and crypto price alerts.
 
-Relaybrook builds practical n8n automations for freelancers, agencies and small teams. Every workflow here uses only core n8n nodes (no community nodes), keeps credentials out of the JSON, and works with free tools where it can: plain HTTP, JavaScript, and any OpenAI-compatible AI API (Google Gemini's free tier by default, or Groq, OpenAI, OpenRouter or a local Ollama).
+Relaybrook builds practical n8n automations for freelancers, agencies and small teams. Every workflow here uses only core n8n nodes (no community nodes), keeps credentials out of the JSON, and works with free tools where it can: plain HTTP, JavaScript, free public APIs, and any OpenAI-compatible AI API (Google Gemini's free tier by default, or Groq, OpenAI, OpenRouter or a local Ollama).
 
 ## Workflows
 
@@ -14,6 +14,7 @@ Relaybrook builds practical n8n automations for freelancers, agencies and small 
 | [Lead list cleaner](workflows/lead-list-cleaner/) | Cleans and deduplicates a lead list from Google Sheets or CSV: name casing, email typo fixes, free-mail/role/disposable flags, company domains, ready/review status. | Nothing (Google Sheets optional) |
 | [Gmail AI inbox triage](workflows/gmail-ai-inbox-triage/) | Rules first, AI second: labels bulk mail without AI, gives everything else a category, priority and summary, and saves reply drafts in the thread. Never sends. | Gmail + AI API key |
 | [Article to social content pack](workflows/article-to-social-content-pack/) | Turns article URLs into a LinkedIn post, numbered X thread, newsletter blurb and key points, with a number fact check and X length checks. Exports Markdown. Never posts. | AI API key |
+| [Crypto price alert lite](workflows/crypto-price-alert-lite/) | Checks a coin list against your own above/below price lines every 15 minutes (CoinGecko, no key) and sends one message to a Discord/Slack/any webhook or Telegram. Alerts once, then re-arms. Read-only. | Nothing (Telegram optional) |
 
 Each folder has a `workflow.json` and a README with setup steps, a test mode and known limitations.
 
@@ -30,17 +31,22 @@ Using a different AI provider? Change `llm_base_url` and `llm_model` in the work
 ## Honest notes
 
 - AI output can be wrong. The workflows check and flag what they can, but review anything before it goes to a customer or gets posted.
-- Each README lists what was tested and what wasn't yet (for example, live Gmail or Google Sheets connections). Found a bug? Please open an issue.
-- No credentials, API keys or personal data are included. Sample data uses made-up names and `.example` domains.
+- Each README lists what was tested and what wasn't yet (for example, live Gmail, Google Sheets or Telegram connections). Found a bug? Please open an issue.
+- No credentials, API keys or personal data are included. Sample data uses made-up names, `.example` domains and made-up prices.
+- The crypto workflow is information only, not financial advice. It reads public prices and can't trade or move funds.
 
-## Want more?
+## Want the full versions?
 
-I build and sell larger n8n packs under the Relaybrook name. If the free workflows are useful, the paid packs go further:
+I build and sell larger n8n packs under the Relaybrook name (store: https://relaybrook.bytesell.app, crypto checkout). If the free workflows are useful, the paid packs go further:
 
+- **New:** [Crypto Watch Pack for n8n](https://relaybrook.bytesell.app/products/crypto-watch-pack-for-n8n?utm_source=github) ($19): price alerts with % moves and cooldowns, a daily portfolio report (Sheets/CSV, P/L vs cost basis), and an incoming-transfer watcher for public TRON, Ethereum and Bitcoin addresses. Read-only, free public APIs, test mode.
+- **New:** [Lead List Cleaner Pro for n8n](https://relaybrook.bytesell.app/products/lead-list-cleaner-pro-for-n8n?utm_source=github) ($9): the bigger version of the free cleaner, with ready/review/companies CSVs, optional MX check, and a webhook/sub-workflow to clean one lead at a time.
 - [AI Lead Enrichment Pack for n8n](https://relaybrook.bytesell.app/products/ai-lead-enrichment-pack-for-n8n?utm_source=github): batch enrichment from Sheets/CSV, ICP scoring, inbound-lead reply drafts, dedupe and hot-lead alerts.
 - [AI Inbox Triage Pack for n8n](https://relaybrook.bytesell.app/products/ai-inbox-triage-pack-for-n8n-sort-prioritise-draft-replies-gmail-outlook-imap?utm_source=github): sort, prioritise and draft replies for Gmail, Outlook and IMAP.
 - [Content Repurposing Pack for n8n](https://relaybrook.bytesell.app/products/content-repurposing-pack-for-n8n-article-youtube-linkedin-x-newsletter-calendar?utm_source=github): article and YouTube to LinkedIn, X, newsletter and a content calendar.
-- [AI Automation Bundle for n8n](https://relaybrook.bytesell.app/products/ai-automation-bundle-for-n8n-lead-enrichment-inbox-triage-content-repurposing-20-workflows?utm_source=github): all three packs in one bundle.
+- [AI Automation Bundle for n8n](https://relaybrook.bytesell.app/products/ai-automation-bundle-for-n8n-lead-enrichment-inbox-triage-content-repurposing-20-workflows?utm_source=github): the three AI packs in one bundle.
+
+Launch offer: 10% off every pack with code **CRYPTO10** until Nov 30, 2026 (crypto checkout).
 
 The free workflows here are complete on their own; you don't need to buy anything to use them.
 
@@ -51,7 +57,3 @@ The free workflows here are complete on their own; you don't need to buy anythin
 ---
 
 n8n is a trademark of n8n GmbH. Relaybrook is not affiliated with, endorsed by or sponsored by n8n GmbH.
-
-## Want the full versions?
-
-These free workflows are part of Relaybrook. Production-ready packs (AI lead enrichment, inbox triage, content repurposing) are at https://relaybrook.bytesell.app. Launch offer: 10% off every pack with code CRYPTO10 until Nov 30, 2026 (crypto checkout).
