@@ -1,6 +1,7 @@
 ![Relaybrook](assets/banner.png)
 
 # Relaybrook: free n8n workflows
+[![Rules first, AI second: n8n Gmail triage walkthrough](assets/rules-first-ai-second.png)](https://relaybrook.bytesell.app)
 
 Free, ready-to-import [n8n](https://n8n.io) workflows for lead research, lead-list cleanup, inbox triage, content repurposing and crypto price alerts.
 
@@ -46,7 +47,7 @@ I build and sell larger n8n packs under the Relaybrook name (store: https://rela
 - [Content Repurposing Pack for n8n](https://relaybrook.bytesell.app/products/content-repurposing-pack-for-n8n-article-youtube-linkedin-x-newsletter-calendar?utm_source=github): article and YouTube to LinkedIn, X, newsletter and a content calendar.
 - [AI Automation Bundle for n8n](https://relaybrook.bytesell.app/products/ai-automation-bundle-for-n8n-lead-enrichment-inbox-triage-content-repurposing-20-workflows?utm_source=github): the three AI packs in one bundle.
 
-Launch offer: 10% off every pack with code **CRYPTO10** until Nov 30, 2026 (crypto checkout).
+Black Friday: 40% off all Relaybrook packs with code BLACKFRIDAY40 until Dec 1, 2026.
 
 The free workflows here are complete on their own; you don't need to buy anything to use them.
 
