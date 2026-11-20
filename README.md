@@ -21,7 +21,7 @@ Each folder has a `workflow.json` and a README with setup steps, a test mode and
 
 ## Quick start
 
-1. Run n8n. These workflows were built and tested on self-hosted n8n 2.47.7 (Docker or npm); they use core nodes only and should also import into n8n Cloud.
+1. Run n8n. These workflows were built and tested on self-hosted n8n 2.47.7 (Docker or npm); they use core nodes only and should also import into n8n Cloud. Tested on n8n 2.47.7 and 3.0 (beta).
 2. Download the `workflow.json` you want (or clone this repo).
 3. In n8n, open **Workflows → Import from File** and pick the file.
 4. For AI workflows: get an API key (for example from Google AI Studio, aistudio.google.com), then create a **Header Auth** credential with Name `Authorization` and Value `Bearer YOUR_KEY`, and select it in the workflow's AI node.
